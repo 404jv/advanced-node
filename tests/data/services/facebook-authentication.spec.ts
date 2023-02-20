@@ -6,15 +6,11 @@ import {
 } from '@/data/contracts/repositories'
 import { FacebookAuthenticationService } from '@/data/services'
 import { AuthenticationError } from '@/domain/errors'
-import { AccessToken } from '@/domain/models'
+import { AccessToken, FacebookAccount } from '@/domain/models'
 
 import { mock, MockProxy } from 'jest-mock-extended'
 
-jest.mock('@/domain/models/facebook-account', () => {
-  return {
-    FacebookAccount: jest.fn().mockImplementation(() => ({}))
-  }
-})
+jest.mock('@/domain/models/facebook-account')
 
 describe('FacebookAuthenticationService', () => {
   let sut: FacebookAuthenticationService
@@ -69,6 +65,9 @@ describe('FacebookAuthenticationService', () => {
   })
 
   it('should call SaveFacebookAccountRepository with FacebookAccount', async () => {
+    const FacebookAccountStub = jest.fn().mockImplementation(() => ({ }))
+    jest.mocked(FacebookAccount).mockImplementation(FacebookAccountStub)
+
     await sut.perform({ token })
 
     expect(userAccountRepo.saveWithFacebook).toHaveBeenCalledWith({})
