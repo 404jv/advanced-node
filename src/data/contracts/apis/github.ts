@@ -1,13 +1,11 @@
-export interface LoadGithubUserApi {
-  loadUser: (params: LoadGithubUserApi.Params) => Promise<LoadGithubUserApi.Result>
+export interface LoadGithubTokenByCodeApi {
+  loadTokenByCode: (params: LoadGithubTokenByCodeApi.Params) => Promise<LoadGithubTokenByCodeApi.Result>
 }
 
-export namespace LoadGithubUserApi {
+export namespace LoadGithubTokenByCodeApi {
   export type Params = {
     code: string
   }
 
-  export type Result = undefined | {
-    access_token: string
-  }
+  export type Result = undefined
 }

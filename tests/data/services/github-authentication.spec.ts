@@ -1,27 +1,15 @@
 import { AuthenticationError } from '@/domain/errors'
-import { LoadGithubUserApi } from '../contracts/apis/github'
+import { LoadGithubTokenByCodeApi } from '../contracts/apis'
 
 class GithubAuthenticationService {
   constructor (
     private readonly loadGithubTokenByCodeApi: LoadGithubTokenByCodeApi
   ) {}
 
-  async perform (params: LoadGithubUserApi.Params): Promise<AuthenticationError> {
+  async perform (params: LoadGithubTokenByCodeApi.Params): Promise<AuthenticationError> {
     await this.loadGithubTokenByCodeApi.loadTokenByCode(params)
     return new AuthenticationError()
   }
-}
-
-interface LoadGithubTokenByCodeApi {
-  loadTokenByCode: (params: LoadGithubTokenByCodeApi.Params) => Promise<LoadGithubTokenByCodeApi.Result>
-}
-
-namespace LoadGithubTokenByCodeApi {
-  export type Params = {
-    code: string
-  }
-
-  export type Result = undefined
 }
 
 class LoadGithubTokenByCodeApiSpy implements LoadGithubTokenByCodeApi {
