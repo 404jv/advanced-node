@@ -5,9 +5,11 @@ import { GithubAuthenticationService } from '@/data/services'
 class LoadGithubTokenByCodeApiSpy implements LoadGithubTokenByCodeApi {
   code?: string
   result = undefined
+  callsCount = 0
 
   async loadTokenByCode (params: LoadGithubTokenByCodeApi.Params): Promise<LoadGithubTokenByCodeApi.Result> {
     this.code = params.code
+    this.callsCount++
     return this.result
   }
 }
@@ -20,6 +22,7 @@ describe('GithubAuthenticationService', () => {
     await sut.perform({ code: 'any_code' })
 
     expect(loadGithubTokenByCodeApi.code).toBe('any_code')
+    expect(loadGithubTokenByCodeApi.callsCount).toBe(1)
   })
 
   it('should return AuthenticationError when LoadGithubTokenByCodeApi returns undefined', async () => {
