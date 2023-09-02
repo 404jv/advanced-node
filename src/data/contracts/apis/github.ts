@@ -7,5 +7,15 @@ export namespace LoadGithubTokenByCodeApi {
     code: string
   }
 
-  export type Result = undefined
+  export type Result = undefined | string
+}
+
+export interface LoadGithubUserByTokenApi {
+  loadUserByToken: (token: string) => Promise<void>
+}
+
+export namespace LoadGithubUserByTokenApi {
+  export type Params = {
+    token: string
+  }
 }
