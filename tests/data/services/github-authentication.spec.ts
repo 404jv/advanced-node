@@ -5,27 +5,25 @@ import { GithubAuthenticationService } from '@/data/services'
 import { mock, MockProxy } from 'jest-mock-extended'
 
 describe('GithubAuthenticationService', () => {
-  let loadGithubTokenByCodeApi: MockProxy<LoadGithubTokenByCodeApi>
-  let loadGithubUserByTokenApi: MockProxy<LoadGithubUserByTokenApi>
+  let githubApi: MockProxy<LoadGithubTokenByCodeApi & LoadGithubUserByTokenApi>
   let sut: GithubAuthenticationService
   const code = 'any_code'
 
   beforeEach(() => {
-    loadGithubTokenByCodeApi = mock()
-    loadGithubTokenByCodeApi.loadTokenByCode.mockResolvedValue('any_token')
-    loadGithubUserByTokenApi = mock()
-    sut = new GithubAuthenticationService(loadGithubTokenByCodeApi, loadGithubUserByTokenApi)
+    githubApi = mock()
+    githubApi.loadTokenByCode.mockResolvedValue('any_token')
+    sut = new GithubAuthenticationService(githubApi)
   })
 
   it('should call LoadGithubTokenByCodeApi with correct params', async () => {
     await sut.perform({ code })
 
-    expect(loadGithubTokenByCodeApi.loadTokenByCode).toHaveBeenCalledWith({ code })
-    expect(loadGithubTokenByCodeApi.loadTokenByCode).toHaveBeenCalledTimes(1)
+    expect(githubApi.loadTokenByCode).toHaveBeenCalledWith({ code })
+    expect(githubApi.loadTokenByCode).toHaveBeenCalledTimes(1)
   })
 
   it('should return AuthenticationError when LoadGithubTokenByCodeApi returns undefined', async () => {
-    loadGithubTokenByCodeApi.loadTokenByCode.mockResolvedValueOnce(undefined)
+    githubApi.loadTokenByCode.mockResolvedValueOnce(undefined)
 
     const authResult = await sut.perform({ code })
 
@@ -35,12 +33,12 @@ describe('GithubAuthenticationService', () => {
   it('should call LoadGithubUserByTokenApi when LoadGithubTokenByCodeApi returns data', async () => {
     await sut.perform({ code })
 
-    expect(loadGithubUserByTokenApi.loadUserByToken).toHaveBeenCalledWith('any_token')
-    expect(loadGithubUserByTokenApi.loadUserByToken).toHaveBeenCalledTimes(1)
+    expect(githubApi.loadUserByToken).toHaveBeenCalledWith('any_token')
+    expect(githubApi.loadUserByToken).toHaveBeenCalledTimes(1)
   })
 
   it('should return AuthenticationError when LoadGithubUserByTokenApi returns undefined', async () => {
-    loadGithubUserByTokenApi.loadUserByToken.mockResolvedValueOnce(undefined)
+    githubApi.loadUserByToken.mockResolvedValueOnce(undefined)
 
     const authResult = await sut.perform({ code })
 

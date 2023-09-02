@@ -4,14 +4,13 @@ import { LoadGithubTokenByCodeApi, LoadGithubUserByTokenApi } from '@/data/contr
 
 export class GithubAuthenticationService implements GithubAuthentication {
   constructor (
-    private readonly loadGithubTokenByCodeApi: LoadGithubTokenByCodeApi,
-    private readonly loadGithubUserByTokenApi: LoadGithubUserByTokenApi
+    private readonly githubApi: LoadGithubTokenByCodeApi & LoadGithubUserByTokenApi
   ) {}
 
   async perform (params: GithubAuthentication.Params): Promise<AuthenticationError> {
-    const githubToken = await this.loadGithubTokenByCodeApi.loadTokenByCode(params)
+    const githubToken = await this.githubApi.loadTokenByCode(params)
     if (githubToken !== undefined) {
-      await this.loadGithubUserByTokenApi.loadUserByToken(githubToken)
+      await this.githubApi.loadUserByToken(githubToken)
     }
     return new AuthenticationError()
   }
