@@ -38,4 +38,12 @@ describe('GithubAuthenticationService', () => {
     expect(loadGithubUserByTokenApi.loadUserByToken).toHaveBeenCalledWith('any_token')
     expect(loadGithubUserByTokenApi.loadUserByToken).toHaveBeenCalledTimes(1)
   })
+
+  it('should return AuthenticationError when LoadGithubUserByTokenApi returns undefined', async () => {
+    loadGithubUserByTokenApi.loadUserByToken.mockResolvedValueOnce(undefined)
+
+    const authResult = await sut.perform({ code })
+
+    expect(authResult).toEqual(new AuthenticationError())
+  })
 })
