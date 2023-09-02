@@ -29,3 +29,20 @@ export namespace SaveFacebookAccountRepository {
     id: string
   }
 }
+
+export interface SaveGithubAccountRepository {
+  saveWithGithub: (params: SaveGithubAccountRepository.Params) => Promise<SaveGithubAccountRepository.Result>
+}
+
+export namespace SaveGithubAccountRepository {
+  export type Params = {
+    id?: string
+    name: string
+    email: string
+    githubId: string
+  }
+
+  export type Result = {
+    id: string
+  }
+}

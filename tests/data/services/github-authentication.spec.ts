@@ -1,13 +1,14 @@
 import { AuthenticationError } from '@/domain/errors'
 import { LoadGithubTokenByCodeApi, LoadGithubUserByTokenApi } from '@/data/contracts/apis'
 import { GithubAuthenticationService } from '@/data/services'
-import { LoadUserAccountRepository } from '@/data/contracts/repositories'
+import { LoadUserAccountRepository, SaveGithubAccountRepository } from '@/data/contracts/repositories'
 
 import { mock, MockProxy } from 'jest-mock-extended'
 
 describe('GithubAuthenticationService', () => {
   let githubApi: MockProxy<LoadGithubTokenByCodeApi & LoadGithubUserByTokenApi>
   let loadUserAccountRepo: MockProxy<LoadUserAccountRepository>
+  let saveGithubAccountRepo: MockProxy<SaveGithubAccountRepository>
 
   let sut: GithubAuthenticationService
   const code = 'any_code'
@@ -21,7 +22,8 @@ describe('GithubAuthenticationService', () => {
       githubId: 'any_gh_id'
     })
     loadUserAccountRepo = mock()
-    sut = new GithubAuthenticationService(githubApi, loadUserAccountRepo)
+    saveGithubAccountRepo = mock()
+    sut = new GithubAuthenticationService(githubApi, loadUserAccountRepo, saveGithubAccountRepo)
   })
 
   it('should call LoadGithubTokenByCodeApi with correct params', async () => {
@@ -59,5 +61,18 @@ describe('GithubAuthenticationService', () => {
 
     expect(loadUserAccountRepo.load).toHaveBeenCalledWith({ email: 'any_gh_email' })
     expect(loadUserAccountRepo.load).toHaveBeenCalledTimes(1)
+  })
+
+  it('should call SaveGithubAccountRepository when LoadUserAccountRepo returns undefined', async () => {
+    loadUserAccountRepo.load.mockResolvedValueOnce(undefined)
+
+    await sut.perform({ code })
+
+    expect(saveGithubAccountRepo.saveWithGithub).toHaveBeenCalledWith({
+      name: 'any_gh_name',
+      email: 'any_gh_email',
+      githubId: 'any_gh_id'
+    })
+    expect(saveGithubAccountRepo.saveWithGithub).toHaveBeenCalledTimes(1)
   })
 })
