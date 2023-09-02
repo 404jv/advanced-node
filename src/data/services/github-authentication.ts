@@ -6,8 +6,7 @@ import { LoadUserAccountRepository, SaveGithubAccountRepository } from '@/data/c
 export class GithubAuthenticationService implements GithubAuthentication {
   constructor (
     private readonly githubApi: LoadGithubTokenByCodeApi & LoadGithubUserByTokenApi,
-    private readonly loadUserAccountRepo: LoadUserAccountRepository,
-    private readonly saveGithubAccountRepo: SaveGithubAccountRepository
+    private readonly userAccountRepo: LoadUserAccountRepository & SaveGithubAccountRepository
   ) {}
 
   async perform (params: GithubAuthentication.Params): Promise<AuthenticationError> {
@@ -15,8 +14,8 @@ export class GithubAuthenticationService implements GithubAuthentication {
     if (githubToken !== undefined) {
       const user = await this.githubApi.loadUserByToken({ token: githubToken })
       if (user !== undefined) {
-        await this.loadUserAccountRepo.load({ email: user.email })
-        await this.saveGithubAccountRepo.saveWithGithub(user)
+        await this.userAccountRepo.load({ email: user.email })
+        await this.userAccountRepo.saveWithGithub(user)
       }
     }
     return new AuthenticationError()

@@ -7,9 +7,7 @@ import { mock, MockProxy } from 'jest-mock-extended'
 
 describe('GithubAuthenticationService', () => {
   let githubApi: MockProxy<LoadGithubTokenByCodeApi & LoadGithubUserByTokenApi>
-  let loadUserAccountRepo: MockProxy<LoadUserAccountRepository>
-  let saveGithubAccountRepo: MockProxy<SaveGithubAccountRepository>
-
+  let userRepo: MockProxy<LoadUserAccountRepository & SaveGithubAccountRepository>
   let sut: GithubAuthenticationService
   const code = 'any_code'
 
@@ -21,9 +19,8 @@ describe('GithubAuthenticationService', () => {
       email: 'any_gh_email',
       githubId: 'any_gh_id'
     })
-    loadUserAccountRepo = mock()
-    saveGithubAccountRepo = mock()
-    sut = new GithubAuthenticationService(githubApi, loadUserAccountRepo, saveGithubAccountRepo)
+    userRepo = mock()
+    sut = new GithubAuthenticationService(githubApi, userRepo)
   })
 
   it('should call LoadGithubTokenByCodeApi with correct params', async () => {
@@ -59,20 +56,20 @@ describe('GithubAuthenticationService', () => {
   it('should call LoadUserAccountRepo when LoadGithubUserByTokenApi returns data', async () => {
     await sut.perform({ code })
 
-    expect(loadUserAccountRepo.load).toHaveBeenCalledWith({ email: 'any_gh_email' })
-    expect(loadUserAccountRepo.load).toHaveBeenCalledTimes(1)
+    expect(userRepo.load).toHaveBeenCalledWith({ email: 'any_gh_email' })
+    expect(userRepo.load).toHaveBeenCalledTimes(1)
   })
 
   it('should call SaveGithubAccountRepository when LoadUserAccountRepo returns undefined', async () => {
-    loadUserAccountRepo.load.mockResolvedValueOnce(undefined)
+    userRepo.load.mockResolvedValueOnce(undefined)
 
     await sut.perform({ code })
 
-    expect(saveGithubAccountRepo.saveWithGithub).toHaveBeenCalledWith({
+    expect(userRepo.saveWithGithub).toHaveBeenCalledWith({
       name: 'any_gh_name',
       email: 'any_gh_email',
       githubId: 'any_gh_id'
     })
-    expect(saveGithubAccountRepo.saveWithGithub).toHaveBeenCalledTimes(1)
+    expect(userRepo.saveWithGithub).toHaveBeenCalledTimes(1)
   })
 })
